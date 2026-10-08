@@ -8,6 +8,24 @@ A user-level [Claude Code](https://claude.com/claude-code) action skill that pic
 
 The skill sets `disable-model-invocation: true`, so Claude never loads it on its own. It runs only when you type `/continue`.
 
+## Parallel mode
+
+| Invocation | What happens |
+| --- | --- |
+| `/continue` | Works the next ticket (default). |
+| `/continue parallel` | Works up to 4 independent tickets at once. |
+| `/continue parallel <n>` | Works up to `<n>` independent tickets at once. |
+
+In parallel mode Claude:
+
+1. Picks open tickets that are not blocked and should not touch the same area, then shows them with the merge order.
+2. Creates one worktree per ticket at `<repo-parent>/<repo-name>-worktrees/<IDENTIFIER>-<desc>`, on branch `<IDENTIFIER>/<desc>`, and moves each ticket to In Progress.
+3. Runs one subagent per worktree at the same time. Each one implements, tests, commits, pushes, and opens a PR.
+4. Merges the PRs one at a time. Before each merge it pulls the latest default branch into the branch, resolves conflicts, re-runs checks, and waits for CI. Then it moves the ticket to Done.
+5. Removes merged worktrees and reports each ticket as merged, open, or blocked.
+
+If a conflict is unclear, checks keep failing, or a PR cannot be merged, the merge loop stops and leaves the remaining PRs open.
+
 ## Install
 
 ```bash

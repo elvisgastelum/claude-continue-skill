@@ -22,6 +22,9 @@ d="$(fresh empty)"
 run "$d"
 check "fresh install copies the skill" "cmp -s '$ROOT/$SKILL' '$d/$SKILL'"
 check "skill is manual only" "grep -qx 'disable-model-invocation: true' '$d/$SKILL'"
+check "skill reads its arguments" "grep -q '\$ARGUMENTS' '$d/$SKILL'"
+check "skill has parallel mode" "grep -qx '## Parallel mode' '$d/$SKILL'"
+check "skill keeps the single-ticket prompt" "grep -qx '/implement Continue next kaneo ticket work, move it to in progress, then commit and create the mr' '$d/$SKILL'"
 
 # Re-run is a no-op.
 n="$(backups "$d")"
